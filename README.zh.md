@@ -321,7 +321,7 @@ OpenTalking 的 LLM 走 OpenAI-compatible 接口，把 `OPENTALKING_LLM_BASE_URL
 - **更早基础能力：实时对话主链路与模型 backend 解耦**
   已建立 Web 控制台、LLM 对话、TTS、字幕事件、WebRTC 音视频播放、Avatar 资产预热缓存、统一 audio2video runner，以及 `mock` / `local` / `direct_ws` / `omnirt` 等可插拔模型后端。
 
-## 文档与社区
+## 文档
 
 - [快速开始](https://datascale-ai.github.io/opentalking/latest/quick-start/)
 - [模型](https://datascale-ai.github.io/opentalking/latest/model-deployment/)（权重下载、国内源、启动、验证）
@@ -330,23 +330,6 @@ OpenTalking 的 LLM 走 OpenAI-compatible 接口，把 `OPENTALKING_LLM_BASE_URL
 - [部署文档](https://datascale-ai.github.io/opentalking/latest/deployment/)（Docker Compose、分布式部署）
 - [模型适配](https://datascale-ai.github.io/opentalking/latest/developer-guide/model-adapter/)
 - [贡献指南](CONTRIBUTING.md)（开发环境、CLI 工具、ruff / mypy / pytest）
-
-欢迎加入 QQ / 微信交流群，讨论实时数字人、FlashTalk、OmniRT、模型部署和产品场景。
-
-<table align="center">
-  <tr>
-    <td align="center"><b>QQ</b></td>
-    <td align="center"><b>微信</b></td>
-  </tr>
-  <tr>
-    <td align="center"><img src="docs/assets/images/qq_group_qrcode.png" alt="AI 数字人 QQ 交流群二维码" width="260"></td>
-    <td align="center"><img src="docs/assets/images/wechat_group_qrcode.png" alt="AI 数字人微信交流群二维码" width="260"></td>
-  </tr>
-</table>
-
-<p align="center">
-  <b>AI 数字人交流群</b> · QQ 群号：<code>1103327938</code> · 微信群
-</p>
 
 ## 致谢
 

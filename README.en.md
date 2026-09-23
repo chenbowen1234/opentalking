@@ -323,7 +323,7 @@ OpenTalking uses an OpenAI-compatible interface for LLMs. Point `OPENTALKING_LLM
 - **Earlier foundation: real-time conversation path and backend decoupling**
   Built the Web console, LLM conversation, TTS, subtitle events, WebRTC audio/video playback, Avatar prewarm and cache, unified audio2video runner, and pluggable `mock` / `local` / `direct_ws` / `omnirt` model backends.
 
-## Documentation And Community
+## Documentation
 
 - [Quickstart](https://datascale-ai.github.io/opentalking/latest/en/quick-start/)
 - [Models](https://datascale-ai.github.io/opentalking/latest/en/model-deployment/) (weight downloads, mirrors, startup, validation)
@@ -332,23 +332,6 @@ OpenTalking uses an OpenAI-compatible interface for LLMs. Point `OPENTALKING_LLM
 - [Deployment](https://datascale-ai.github.io/opentalking/latest/en/deployment/) (Docker Compose, distributed deployment)
 - [Model adapter](https://datascale-ai.github.io/opentalking/latest/en/developer-guide/model-adapter/)
 - [Contributing](CONTRIBUTING.md) (dev environment, CLI tools, ruff / mypy / pytest)
-
-Join the QQ or WeChat community to discuss real-time digital humans, FlashTalk, OmniRT, model deployment, and product scenarios.
-
-<table align="center">
-  <tr>
-    <td align="center"><b>QQ</b></td>
-    <td align="center"><b>WeChat</b><br><b>微信</b></td>
-  </tr>
-  <tr>
-    <td align="center"><img src="docs/assets/images/qq_group_qrcode.png" alt="AI digital human QQ group QR code" width="260"></td>
-    <td align="center"><img src="docs/assets/images/wechat_group_qrcode.png" alt="AI digital human WeChat group QR code" width="260"></td>
-  </tr>
-</table>
-
-<p align="center">
-  <b>AI Digital Human Community</b> · QQ Group ID: <code>1103327938</code> · WeChat
-</p>
 
 ## Acknowledgements
 
