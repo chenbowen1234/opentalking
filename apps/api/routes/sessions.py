@@ -1248,6 +1248,8 @@ async def speak_audio_stream_ws(websocket: WebSocket, session_id: str) -> None:
         try:
             while True:
                 msg = await websocket.receive()
+                if msg.get("type") == "websocket.disconnect":
+                    return
                 if msg.get("type") != "websocket.receive":
                     continue
                 if msg.get("bytes"):
@@ -1316,7 +1318,7 @@ async def speak_audio_stream_ws(websocket: WebSocket, session_id: str) -> None:
     )
 
     stripped = text.strip()
-    if not stripped:
+    if not stripped or not any(char.isalnum() for char in stripped):
         await websocket.send_json({"error": "未能识别有效语音，请重试。"})
         await websocket.close(code=4400)
         return

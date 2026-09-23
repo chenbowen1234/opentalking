@@ -2,7 +2,8 @@ export type SseHandler = (event: string, data: unknown) => void;
 
 export function connectSse(url: string, onEvent: SseHandler): () => void {
   const es = new EventSource(url);
-  const anyHandler = (ev: MessageEvent) => {
+  const anyHandler = (ev: Event) => {
+    if (!("data" in ev)) return;
     try {
       const parsed = JSON.parse(ev.data as string);
       onEvent(ev.type || "message", parsed);

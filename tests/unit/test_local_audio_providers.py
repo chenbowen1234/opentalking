@@ -1191,6 +1191,30 @@ def test_stt_factory_routes_local_providers(monkeypatch):
     assert calls[-1] == ("pcm", 16000)
 
 
+def test_local_stt_pcm_writer_trims_outer_silence_but_keeps_context(tmp_path):
+    from opentalking.providers.stt.factory import _write_pcm_queue_to_wav
+
+    sample_rate = 16000
+    leading_silence = np.zeros(sample_rate, dtype=np.int16)
+    speech = np.full(sample_rate // 2, 2400, dtype=np.int16)
+    trailing_silence = np.zeros(sample_rate, dtype=np.int16)
+    pcm = np.concatenate((leading_silence, speech, trailing_silence))
+    chunks: queue.Queue[bytes | None] = queue.Queue()
+    midpoint = pcm.nbytes // 2
+    chunks.put(pcm.tobytes()[:midpoint])
+    chunks.put(pcm.tobytes()[midpoint:])
+    chunks.put(None)
+    wav_path = tmp_path / "trimmed.wav"
+
+    _write_pcm_queue_to_wav(chunks, wav_path, sample_rate=sample_rate)
+
+    with wave.open(str(wav_path), "rb") as wf:
+        written_frames = wf.getnframes()
+    # Keep enough acoustic context around the 0.5 s utterance, but do not
+    # send both full seconds of transport/VAD silence into batch inference.
+    assert int(sample_rate * 0.75) <= written_frames <= int(sample_rate * 0.95)
+
+
 def test_stt_factory_request_provider_override_routes_dashscope(monkeypatch):
     from opentalking.providers.stt import factory
 

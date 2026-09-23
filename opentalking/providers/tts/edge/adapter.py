@@ -77,7 +77,8 @@ def _split_pcm_chunks(pcm: np.ndarray, sr: int, chunk_ms: float) -> list[AudioCh
 
 
 async def _edge_audio_stream(text: str, voice: str) -> AsyncIterator[bytes]:
-    for attempt in range(3):
+    max_attempts = 5
+    for attempt in range(max_attempts):
         try:
             communicate = edge_tts.Communicate(text, voice)
             async for event in communicate.stream():
@@ -85,7 +86,7 @@ async def _edge_audio_stream(text: str, voice: str) -> AsyncIterator[bytes]:
                     yield event["data"]
             return
         except Exception:
-            if attempt == 2:
+            if attempt == max_attempts - 1:
                 raise
             log.warning("Edge TTS stream failed; retrying", exc_info=True)
             await asyncio.sleep(0.3 * (attempt + 1))

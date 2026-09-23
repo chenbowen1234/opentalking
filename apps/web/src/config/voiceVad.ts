@@ -9,11 +9,17 @@
  * VITE_VOICE_SOFT_START_FRAMES — 连续多少帧超过 SOFT_START 才触发起段
  * VITE_VOICE_BARGE_SPEECH_RMS — 数字人播报时「抢话」阈值，应高于 SPEECH，减轻回声误触
  * VITE_VOICE_BARGE_ATTACK_FRAMES — 播报时抢话需连续超过阈值的帧数（更严）
+ * VITE_VOICE_CAPTURE_DURING_PLAYBACK — 是否允许播报时用声音自动抢话；默认关闭以避免扬声器回声
  */
 
 function num(envVal: string | undefined, fallback: number): number {
   const n = Number(envVal);
   return Number.isFinite(n) ? n : fallback;
+}
+
+function bool(envVal: string | undefined, fallback: boolean): boolean {
+  if (envVal === undefined) return fallback;
+  return !["0", "false", "no", "off"].includes(envVal.trim().toLowerCase());
 }
 
 export type VoiceVadConfig = {
@@ -26,6 +32,7 @@ export type VoiceVadConfig = {
   softStartFrames: number;
   bargeInSpeechRms: number;
   bargeInAttackFrames: number;
+  captureDuringPlayback: boolean;
 };
 
 export function getVoiceVadConfig(): VoiceVadConfig {
@@ -49,5 +56,6 @@ export function getVoiceVadConfig(): VoiceVadConfig {
     ),
     bargeInSpeechRms: Math.max(bargeClamped, speechClamped * 1.25),
     bargeInAttackFrames: Math.min(40, Math.max(3, Math.floor(num(import.meta.env.VITE_VOICE_BARGE_ATTACK_FRAMES, 8)))),
+    captureDuringPlayback: bool(import.meta.env.VITE_VOICE_CAPTURE_DURING_PLAYBACK, false),
   };
 }

@@ -15,6 +15,7 @@ from typing import Any
 import numpy as np
 
 from opentalking.core.model_paths import local_audio_model_root
+from opentalking.providers.stt.pcm import trim_outer_silence
 
 STT_PROVIDERS = frozenset({"dashscope", "openai_compatible", "xiaomi_mimo", "funasr", "sensevoice", "sherpa_onnx"})
 LOCAL_STT_PROVIDERS = frozenset({"funasr", "sensevoice", "sherpa_onnx"})
@@ -299,7 +300,8 @@ def _write_pcm_queue_to_wav(
         wf.setnchannels(1)
         wf.setsampwidth(2)
         wf.setframerate(sample_rate)
-        wf.writeframes(b"".join(chunks))
+        pcm_bytes = trim_outer_silence(b"".join(chunks), sample_rate=sample_rate)
+        wf.writeframes(pcm_bytes)
 
 
 def _extract_text(result: Any) -> str:

@@ -255,7 +255,13 @@ export function ChatInput({
         }
         return null;
       }
-      const reply = await awaitSttWsReply(ws);
+      setVoiceBusy(true);
+      let reply: { text?: string; error?: string };
+      try {
+        reply = await awaitSttWsReply(ws);
+      } finally {
+        setVoiceBusy(false);
+      }
       try {
         ws.close();
       } catch {
@@ -475,11 +481,12 @@ export function ChatInput({
     const now = performance.now();
     const { disabled: d, voiceBusy: vb, isSpeaking: spk } = uiRef.current;
 
-    /** 上传中 / 禁用 时整段暂停；播报中不整段暂停，改用更高阈值的抢话检测 */
-    const hardPaused = d || vb || uploadLockRef.current;
+    /** 默认在播报时暂停收音，避免扬声器回声被当成新问题；仍可用红钮手动打断。 */
+    const captureDuringPlayback = vadCfg.current.captureDuringPlayback;
+    const hardPaused = d || vb || uploadLockRef.current || (spk && !captureDuringPlayback);
     if (!hardPaused) {
-      /** 数字人正在出声时，用更高能量 + 更长连帧判定抢话，减轻扬声器回声误触 */
-      const bargeMode = spk;
+      /** 显式开启自动抢话时，使用更高能量 + 更长连帧判定。 */
+      const bargeMode = spk && captureDuringPlayback;
 
       if (!segmentActiveRef.current) {
         const speechTh = bargeMode ? cfg.bargeInSpeechRms : cfg.speechRms;
@@ -672,8 +679,11 @@ export function ChatInput({
     voiceBreakGenRef.current += 1;
     uploadLockRef.current = false;
     await discardActiveSegment();
+    if (voiceMode) {
+      await teardownVoicePipeline();
+    }
     onInterrupt();
-  }, [discardActiveSegment, onInterrupt]);
+  }, [discardActiveSegment, onInterrupt, teardownVoicePipeline, voiceMode]);
 
   const handleKey = useCallback(
     (e: KeyboardEvent<HTMLTextAreaElement>) => {
@@ -708,8 +718,20 @@ export function ChatInput({
     <div className="rounded-lg border border-slate-200 bg-white p-3 shadow-sm">
       <div className="flex flex-col gap-2">
         {voiceMode ? (
-          <p className="rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-center text-[11px] leading-relaxed text-emerald-700">
-            连续对话：静音自动断句并识别。播报时可大声抢话或点红钮打断。
+          <p
+            role="status"
+            aria-live="polite"
+            className="rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-center text-[11px] font-medium leading-relaxed text-emerald-700"
+          >
+            {voiceBusy
+              ? "正在识别刚才的话…"
+              : isSpeaking
+                ? vadCfg.current.captureDuringPlayback
+                  ? "正在播报，可大声抢话或点红钮打断"
+                  : "正在播报，点红钮可立即打断"
+                : segmentHot
+                  ? "正在听你说话…"
+                  : "正在听，可以开始说话"}
           </p>
         ) : onOpenSettings ? (
           <p className="text-center text-[10px] text-slate-500 lg:hidden">
@@ -814,9 +836,10 @@ export function ChatInput({
               className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-red-600 text-white transition-colors hover:bg-red-500"
               title={
                 voiceMode && (segmentHot || voiceBusy)
-                  ? "打断：丢弃当前收音或取消识别"
+                  ? "停止并退出连续语音"
                   : "停止播报"
               }
+              aria-label={voiceMode ? "停止并退出连续语音" : "停止播报"}
             >
               <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 16 16" fill="currentColor">
                 <rect x="3" y="3" width="10" height="10" rx="1" />
